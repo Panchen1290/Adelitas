@@ -89,5 +89,14 @@
 
 			return mysqli_query($connection, $sql);
 		}
+
+		public function deleteUser($userid) {
+			$c = new connect();
+			$connection = $c->connection();
+
+			$sql="DELETE from users where id_user='$userid'";
+
+			return mysqli_query($connection, $sql);
+		}
 	}
  ?>

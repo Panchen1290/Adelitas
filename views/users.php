@@ -98,6 +98,26 @@
 			}
 		});
 	}
+
+	function deleteUser(userId) {
+		alertify.confirm('Desea eliminar este usuario?', function() {
+			$.ajax({
+				type:"POST",
+				data:"userid=" + userId,
+				url:"../processes/users/deleteUser.php",
+				success:function(r) {
+					if (r == 1) {
+						$('#loadUsersTable').load("users/usersTable.php");
+						alertify.success("Eliminado con exito");
+					} else {
+						alertify.error("No se pudo eliminar");
+					}
+				}
+			});
+		}, function() {
+			alertify.error('Cancelado');
+		});
+	}
 </script>
 
 <script type="text/javascript">
