@@ -14,7 +14,7 @@
 		<h1>Clientes</h1>
 		<div class="row">
 			<div class="col-sm-4">
-				<form id="frmClients">
+				<form id="clientsForm">
 					<label>Nombre</label>
 					<input type="text" class="form-control input-sm" name="name" id="name">
 					<label>Apellido</label>
@@ -42,20 +42,21 @@
 
 		$('#btnAddClient').click(function() {
 
-			empty = validateFormEmpty('frmClients');
+			empty = validateFormEmpty('clientsForm');
 
 			if (empty > 0) {
 				alertify.alert("Se debe llenar todos los campos");
 				return false;
 			}
 
-			data=$('#frmClients').serialize();
+			data=$('#clientsForm').serialize();
 			$.ajax({
 				type:"POST",
-				data:data, 
+				data:data,
 				url:"../processes/clients/addClient.php",
 				success:function(r) {
 					if (r == 1) {
+						$('#clientsForm')[0].reset();
 						$('#loadClientsTable').load("clients/clientsTable.php");
 						alertify.success("Agregado con exito!");
 					} else {
