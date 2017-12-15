@@ -1,6 +1,10 @@
 <?php 
 	session_start();
 	if(isset($_SESSION['user'])) {
+
+	require_once "../classes/Connection.php";
+	$c = new connect();
+	$connection = $c->connection();
 ?>
 
 <!DOCTYPE html>
@@ -14,25 +18,51 @@
 		<h1>Vender</h1>
 			<div class="row">
 				<div class="col-sm-4">
-					<form id="frmSellProduct">
+					<form id="sellProductForm">
 						<label>Selecciona Cliente</label>
 						<select class="form-control input-sm" name="clientSelect" id="clientSelect">
 							<option value="A">Seleccionar</option>
+							<option value="0">Sin cliente</option>
+							<?php 
+								$sql="SELECT id_client, name, lastname from clients";
+								$result = mysqli_query($connection, $sql);
+
+								while ($client = mysqli_fetch_row($result)) :
+							?>
+							<option value="<?php echo $client[0] ?>"><?php echo $client[2]." ".$client[1] ?></option>
+							<?php 
+							 	endwhile;
+							?>
 						</select>
 						<label>Codigo de Producto</label>
-						<input class="form-control input-sm" name="" id=""></input>
+						<input class="form-control input-sm" name="barcode" id="barcode"></input>
 						<label>Selecciona Producto</label>
 						<select class="form-control input-sm" name="productSelect" id="productSelect">
 							<option value="A">Seleccionar</option>
+							<?php 
+								$sql="SELECT id_product, name from products";
+								$result = mysqli_query($connection, $sql);
+								
+								while ($product = mysqli_fetch_row($result)) :
+							?>
+							<option value="<?php echo $product[0] ?>"><?php echo $product[1] ?></option>
+							<?php 
+								endwhile;
+							 ?>
 						</select> 
 						<label>Cantidad</label>
-						<input type="text" class="form-control input-sm" name="" id="">
+						<input type="text" class="form-control input-sm" name="amount" id="amount">
+						<label>Descripcion</label>
+						<input type="text" readonly="" class="form-control input-sm" name="description" id="description">
+						<label>Precio</label>
+						<input type="text" readonly="" class="form-control input-sm" name="price" id="price">
 						<p></p>
-						<span class="btn btn-primary" id="btnAddSale">Agregar</span>
+						<span class="btn btn-primary" id="btnAddToSale">Agregar</span>
+						<span class="btn btn-danger" id="btnEmptySale">Vaciar Productos</span>
 					</form>
 				</div>
 				<div class="col-sm-8">
-					<div id="loadSellTable"></div>
+ 					<div id="loadTempSellTable"></div>
 				</div>
 			</div>
 	</div>
@@ -41,37 +71,80 @@
 
 <script type="text/javascript">
 	$(document).ready(function() {
-		$('#clientSelect').select2();
-		$('#productSelect').select2();
+		$('#loadTempSellTable').load("sales/tempSellTable.php");
 
-		$('#loadSellTable').load("sales/sellTable.php");
-
-		$('#btnAddSale').click(function() {
-
-			empty = validateFormEmpty('frmSellProduct');
+		$('#btnAddToSale').click(function() {
+			empty = validateFormEmpty('sellProductForm');
 
 			if (empty > 0) {
 				alertify.alert("Se debe llenar todos los campos");
 				return false;
 			}
 
-			data=$('#frmSellProduct').serialize();
+			data=$('#sellProductForm').serialize();
 			$.ajax({
 				type:"POST",
 				data:data, 
-				url:"../processes/products/addProducts.php",
+				url:"../processes/sales/addProductTemp.php",
 				success:function(r) {
-					if (r == 1) {
-						$('#loadProductsTable').load("products/productsTable.php");
-						alertify.success("Agregado con exito!");
-					} else {
-						alertify.error("No se pudo agregar");
-					}
+					$('#loadTempSellTable').load("sales/tempSellTable.php");
 				}
 			});
 		});
 
+		$('#btnEmptySale').click(function() {
+			$.ajax({
+				url:"../processes/sales/emptyTemp.php",
+				success:function(r) {
+					$('#loadTempSellTable').load("sales/tempSellTable.php");
+				}
+			});
+		});
+	});
+</script>
 
+<script type="text/javascript">
+	$(document).ready(function() {
+		$('#productSelect').change(function() {
+			$.ajax({
+				type:"POST",
+				data:"productid="+$('#productSelect').val(), 
+				url:"../processes/sales/fillProductFormByName.php",
+				success:function(r) {
+					data = jQuery.parseJSON(r);
+					$('#barcode').val(data['barcode']);
+					$('#amount').val(1);
+					$('#description').val(data['description']);
+					$('#price').val(data['price']);
+				}
+			});
+		});
+	});
+</script>
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		$('#barcode').change(function() {
+			$.ajax({
+				type:"POST",
+				data:"productbarcode="+$('#barcode').val(), 
+				url:"../processes/sales/fillProductFormByBarcode.php",
+				success:function(r) {
+					data = jQuery.parseJSON(r);
+					$('#productSelect').val(data['id_product']);
+					$('#amount').val(1);
+					$('#description').val(data['description']);
+					$('#price').val(data['price']);
+				}
+			});
+		});
+	});
+</script>
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		$('#clientSelect').select2();
+		$('#productSelect').select2();
 	});
 </script>
 

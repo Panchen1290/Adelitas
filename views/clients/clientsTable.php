@@ -27,12 +27,12 @@
 			<td><?php echo $view[3]; ?></td>
 			<td><?php echo $view[4]; ?></td>
 			<td>
-				<span class="btn btn-warning btn-xs">
+				<span class="btn btn-warning btn-xs" data-toggle="modal" data-target="#updateClientModal" onclick="addClientData('<?php echo $view[0]; ?>')">
 					<span class="glyphicon glyphicon-pencil"></span>
 				</span>
 			</td>
 			<td>
-				<span class="btn btn-danger btn-xs">
+				<span class="btn btn-danger btn-xs" onclick="deleteClient('<?php echo $view[0]; ?>')">
 					<span class="glyphicon glyphicon-remove"></span>
 				</span>
 			</td>

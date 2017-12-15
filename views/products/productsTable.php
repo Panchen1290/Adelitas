@@ -50,7 +50,7 @@
 					$imgView=explode("/", $view[6]);
 					$imgPath=$imgView[1]."/".$imgView[2]."/".$imgView[3];
 				?>
-				<img src="<?php echo $imgPath ?>" width="80" height="50">
+				<img class="img-thumbnail" src="<?php echo $imgPath ?>" width="80" height="50">
 			</td>
 			<td>
 				<span class="btn btn-warning btn-xs" data-toggle="modal" data-target="#openModalUpdateProduct" onclick="addProductData('<?php echo $view[7]; ?>')">
