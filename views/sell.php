@@ -21,8 +21,7 @@
 					<form id="sellProductForm">
 						<label>Selecciona Cliente</label>
 						<select class="form-control input-sm" name="clientSelect" id="clientSelect">
-							<option value="A">Seleccionar</option>
-							<option value="0">Sin cliente</option>
+							<option value="0" selected="selected">Sin cliente</option>
 							<?php 
 								$sql="SELECT id_client, name, lastname from clients";
 								$result = mysqli_query($connection, $sql);
@@ -42,7 +41,6 @@
 							<?php 
 								$sql="SELECT id_product, name from products";
 								$result = mysqli_query($connection, $sql);
-								
 								while ($product = mysqli_fetch_row($result)) :
 							?>
 							<option value="<?php echo $product[0] ?>"><?php echo $product[1] ?></option>
@@ -132,6 +130,7 @@
 				success:function(r) {
 					data = jQuery.parseJSON(r);
 					$('#productSelect').val(data['id_product']);
+					$('#productSelect').change();
 					$('#amount').val(1);
 					$('#description').val(data['description']);
 					$('#price').val(data['price']);
@@ -139,6 +138,37 @@
 			});
 		});
 	});
+</script>
+
+<script type="text/javascript">
+	function removeProduct(index) {
+		$.ajax({
+			type:"POST",
+			data:"ind="+index, 
+			url:"../processes/sales/removeProduct.php",
+			success:function(r) {
+				$('#loadTempSellTable').load("sales/tempSellTable.php");
+				alertify.success("Se removio el producto");
+			}
+		});
+	}
+
+	function createSale() {
+		$.ajax({
+			url:"../processes/sales/createSale.php",
+			success:function(r) {
+				$('#loadTempSellTable').load("sales/tempSellTable.php");
+				$('#sellProductForm')[0].reset();
+				if (r > 0) {
+					alertify.alert("Venta hecha con exito, consulte la informacion en Ventas");
+				} else if (r == 0) {
+					alertify.alert("No hay lista de venta");
+				} else {
+					alertify.error("No se pudo crear la venta");
+				}
+			}
+		});
+	}
 </script>
 
 <script type="text/javascript">

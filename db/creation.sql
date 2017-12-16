@@ -57,7 +57,8 @@ create table sales (
 	id_client int,
 	id_product int,
 	id_user int,
-	price float,
-	saleDate date,
-	primary key(id_sale)
+	amount int,
+	unitPrice int,
+	totalPrice float,
+	saleDate date
 );
